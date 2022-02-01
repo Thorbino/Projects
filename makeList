@@ -1,0 +1,136 @@
+Sub makeList()
+    Columns("c:zz").EntireColumn.Delete
+    ActiveSheet.Range("a3").Select
+    'define counters
+    Dim i, j, k, f, l, m, n, maxX As Integer
+    
+    Dim startCell, endCell As Range
+    j = 0
+    maxX = 0
+    'MsgBox ("Flag 1")
+    Do While Selection.Offset(j, 0).Value <> ""
+        If Selection.Offset(j, 1).Value > maxX Then
+            maxX = Selection.Offset(j, 1).Value
+        Else
+        End If
+        j = j + 1
+        'MsgBox ("Flag " & j + 1)
+    Loop
+    
+    Dim listName() As String
+    Dim tempWeight(), finWeight(), MaxVal As Double
+    Dim order() As Integer
+    
+
+    k = 0
+    l = 0
+    n = 0
+    m = 0
+    
+    
+    
+
+    'MsgBox ("Flag " & j + 2)
+  For n = 1 To maxX
+        m = 0
+        j = 0
+        f = 0
+        Do While Selection.Offset(f, 0).Value <> ""
+            If Selection.Offset(f, 1).Value >= n Then
+                j = j + 1
+            Else
+            End If
+            f = f + 1
+        Loop
+        ReDim listName(j)
+        ReDim finWeight(j)
+        ReDim order(j)
+        'reset offset for skip counter
+        m = 0
+    For i = 1 To j
+        MaxVal = 0
+        Do While Selection.Offset(i + m - 1, 1) < n
+            m = m + 1 'skip counter, to skip over entries which have no tests remaining
+        Loop
+        'populate each name for this iteration of tests
+        listName(i) = Selection.Offset(i + m - 1, 0).Value
+        'figure out number of tests for this entry, for this round
+        If Selection.Offset(i + m - 1, 1).Value <> "" Then
+            k = Selection.Offset(i + m - 1, 1).Value
+        Else
+            k = 1
+        End If
+        'set size of test array for this entry for this round
+        ReDim Preserve tempWeight(k)
+        
+        For l = 1 To k
+            'perform k tests for this entry for this round
+            tempWeight(l) = Rnd
+            
+            If tempWeight(l) > MaxVal Then
+                MaxVal = tempWeight(l) 'get max of tests
+                'MsgBox ("Flag " & i + l)
+            Else
+            End If
+            
+        Next l
+        finWeight(i) = MaxVal ' the final max val is the best random number generated in k
+                              ' tests for this entry
+        Selection.Offset(i - 1, 2 + 2 * (n - 1)).Value = listName(i) 'print name result for this entry
+        Selection.Offset(i - 1, 3 + 2 * (n - 1)).Value = finWeight(i) 'print tests result for this entry
+        
+        'MsgBox ("Flag " & j + 2 + i)
+    Next i
+    Dim tRange As Range
+    ActiveSheet.Sort.SortFields.Clear
+    
+    Selection.Offset(-1, 2 + 2 * (n - 1)).Value = "Round " & n
+    Selection.Offset(-1, 3 + 2 * (n - 1)).Value = "Best Random Number " & n
+    Set startCell = Cells(3, 4 + 2 * (n - 1))
+    'endCell = ActiveSheet.Range(Selection.Offset(i, 3 + 2 * (n - 1)))
+    'tRange = ActiveSheet.Selection.Offset(-1, 2 + 2 * (n - 1), i + 1, 2)
+    Set tRange = Range(Cells(3, 3 + 2 * (n - 1)), Cells(3 + i, 4 + 2 * (n - 1)))
+    tRange.Sort Key1:=startCell, Order1:=xlDescending, Header:=xlNo
+
+
+    ActiveSheet.Range("a3").Select
+    
+Next n
+
+    'MsgBox ("Flag " & j + 3 + i)
+End Sub
+
+      Function SelectionSort(TempArray1 As Variant, TempArray2 As Variant)
+          Dim MaxVal As Variant
+          Dim MaxIndex As Integer
+          Dim i, j As Integer
+
+          ' Step through the elements in the array starting with the
+          ' last element in the array.
+          For i = UBound(TempArray) To 1 Step -1
+
+              ' Set MaxVal to the element in the array and save the
+              ' index of this element as MaxIndex.
+              MaxVal = TempArray(i)
+              MaxIndex = i
+
+              ' Loop through the remaining elements to see if any is
+              ' larger than MaxVal. If it is then set this element
+              ' to be the new MaxVal.
+              For j = 1 To i
+                  If TempArray(j) > MaxVal Then
+                      MaxVal = TempArray(j)
+                      MaxIndex = j
+                  End If
+              Next j
+
+              ' If the index of the largest element is not i, then
+              ' exchange this element with element i.
+              If MaxIndex < i Then
+                  TempArray(MaxIndex) = TempArray(i)
+                  TempArray(i) = MaxVal
+              End If
+          Next i
+
+      End Function
+
